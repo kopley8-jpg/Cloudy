@@ -1,13 +1,15 @@
 import { useState } from "react"
-import { ColorValue, Text, View } from "react-native"
+import { ColorValue, StatusBar, StatusBarStyle, Text, View } from "react-native"
+import { SafeAreaView } from "react-native-safe-area-context"
+import { MainScreen } from "./src/pages/MainScreen/ManiScreen"
 
 const App = () => {
 
-  const [col, setCol] = useState<boolean>(false)
 
   return(
-    <View style={{flex:1, backgroundColor:col?"white":"yellow", alignItems:"center", justifyContent:"center"}} onTouchStart={() => setCol(cCol => !cCol)}>
-    </View>
+    <SafeAreaView style={{flex:1}} >
+      <MainScreen/>
+    </SafeAreaView>
   )
 }
 
