@@ -11,18 +11,11 @@ export const EffectPreview = () => {
     const [leds, setLeds] = useState<ILed[]>([
     ])
 
-    const handleLayout = () => {
-        for (let i = 0; i<=20; i++){
-            setLeds(prev => [...prev, {id:i, color:"white"}])
-        }
-    }
  
     return(
         <View style={EffectPreviewStyles.container} >
-            <View style={EffectPreviewStyles.LedsContainer} onLayout={handleLayout}>
-                {leds.map((x) => (
-                    <Led key={x.id}/>
-                ))}
+            <View style={EffectPreviewStyles.LedsContainer}>
+
             </View>
         </View>
     )

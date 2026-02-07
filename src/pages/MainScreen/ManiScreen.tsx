@@ -1,17 +1,13 @@
 import { Button, StyleSheet, View } from "react-native"
 import { EffectPreview } from "../../shared/EffectPreview/EffectPreiew"
 import ColorPicker, { BrightnessSlider, HSLSaturationSlider, HueSlider, OpacitySlider, Panel1, Preview, SaturationSlider, Swatches } from "reanimated-color-picker"
+import { EffectEditor } from "../../shared/EffectEditor/EffectEditor"
 
 export const MainScreen = () => {
     return (
         <View style={MainScreenStyle.container}>
             <EffectPreview/>
-            <ColorPicker style={{ width: '70%', marginTop:20}} value='red' onCompleteJS={p => console.log(p)}>
-                <Preview hideInitialColor={true}/>
-                <HueSlider sliderThickness={20} style={{marginVertical:10}}/>
-                <SaturationSlider sliderThickness={20} style={{marginVertical:10}}/>
-                <BrightnessSlider sliderThickness={20} style={{marginVertical:10}}/>
-            </ColorPicker>
+            <EffectEditor/>
         </View>
     )
 }
