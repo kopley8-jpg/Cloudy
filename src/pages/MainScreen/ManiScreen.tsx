@@ -1,9 +1,10 @@
 import { Button, StyleSheet, View } from "react-native"
-import { EffectPreview } from "../../shared/EffectPreview/EffectPreiew"
+import { EffectPreview } from "../../features/led-control/ui/EffectPreview/EffectPreiew"
 import ColorPicker, { BrightnessSlider, HSLSaturationSlider, HueSlider, OpacitySlider, Panel1, Preview, SaturationSlider, Swatches } from "reanimated-color-picker"
-import { EffectEditor } from "../../shared/EffectEditor/EffectEditor"
+import { EffectEditor } from "../../features/led-control/ui/EffectEditor/EffectEditor"
 
 export const MainScreen = () => {
+
     return (
         <View style={MainScreenStyle.container}>
             <EffectPreview/>
