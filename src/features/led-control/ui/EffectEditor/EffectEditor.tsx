@@ -17,7 +17,6 @@ interface IEffectEditor {
 }
 
 export const EffectEditor = () => {
-    const [effect, setEffect] = useState()
 
     const [effectEditor, setEffectEditor] = useState<IEffectEditor>({
         animatedColor:{
@@ -36,21 +35,30 @@ export const EffectEditor = () => {
     }
 
     const handleThumbsContainerMove = (offset:number) => {
-        setEffectEditor(prev => ({
-            ...prev, 
-            animatedColor:{
-                ...prev.animatedColor, 
-                stops:prev.animatedColor.stops.map(stop => 
-                    stop.id === prev.pickedStopID? 
-                    {...stop, offset:offset}:stop)
-                }
-            }))
+        const stops = effectEditor.animatedColor.stops
+        const sortedStops = [...stops].sort((a, b) => a.offset - b.offset)
+        const pickedStopID = effectEditor.pickedStopID
+        setEffectEditor(prev => ({...prev, animatedColor:{...prev.animatedColor, stops:sortedStops.map(stop => stop.id === pickedStopID?{...stop, offset:offset}:stop)}}))
     }
 
+    const handleColorChange = (color:ColorFormatsObject) => (
+        setEffectEditor(prev => ({...prev, animatedColor:{...prev.animatedColor, stops:prev.animatedColor.stops.map(stop => stop.id === prev.pickedStopID? {...stop, color:color.hex}:stop)}}))
+    )
+
     return(
-        <View style={styles.container}>
-            <ColorPath onThumbsContainerTouchMove={p => handleThumbsContainerMove(p)} onThumbTouchIn={p => handleThumbTouchIn(p)} animatedColor={effectEditor.animatedColor}/>
-            <ColPicker onColorChange={color => {}}/>
+        <View 
+            style={styles.container}>
+            <ColorPath 
+                onThumbsContainerTouchMove={handleThumbsContainerMove} 
+                onThumbTouchIn={handleThumbTouchIn} 
+                animatedColor={effectEditor.animatedColor} 
+                pickedStopId={effectEditor.pickedStopID}/>
+            {effectEditor.pickedStopID?
+                <ColPicker 
+                    color={effectEditor.animatedColor.stops.find(stop => stop.id === effectEditor.pickedStopID)!.color} 
+                    onColorChange={handleColorChange}/>:
+                <></>
+            }
         </View>
     )
 }
@@ -60,15 +68,15 @@ const styles = StyleSheet.create({
         width:"90%",
         height:"40%",
         alignItems:"center",
-        paddingTop:"10%",
+        justifyContent:"center",
         borderColor:"grey",
         borderWidth:2
     }
 })
 
-const ColPicker:React.FC<IColorPicker> = ({onColorChange}) => {
+const ColPicker:React.FC<IColorPicker> = ({color, onColorChange}) => {
     return(
-        <ColorPicker style={{ width: '70%', marginTop:20}} value='red' onCompleteJS={color => onColorChange(color)}>
+        <ColorPicker style={{ width: '70%', marginTop:20}} value={color} onChangeJS={color => onColorChange(color)}>
             <Preview hideInitialColor={true}/>
             <HueSlider sliderThickness={20} style={{marginVertical:10}}/>
             <SaturationSlider sliderThickness={20} style={{marginVertical:10}}/>

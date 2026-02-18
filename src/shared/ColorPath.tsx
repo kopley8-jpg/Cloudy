@@ -1,56 +1,91 @@
 import React, { useState } from "react"
-import { GestureResponderEvent, LayoutChangeEvent, LayoutRectangle, StyleSheet, useWindowDimensions, View } from "react-native"
+import { GestureResponderEvent, LayoutChangeEvent, LayoutRectangle, StyleSheet, Text, useWindowDimensions, View } from "react-native"
 
-import { AnimatedColor } from "../features/led-control/ui/EffectEditor/interfaces"
+import { AnimatedColor, Stop } from "../features/led-control/ui/EffectEditor/interfaces"
 import LinearGradient from "react-native-linear-gradient"
 
 interface IColorPath {
     animatedColor:AnimatedColor,
+    pickedStopId:number|null,
     onThumbTouchIn:(id:number) => void,
     onThumbsContainerTouchMove: (offset:number) => void
 }
 
-export const ColorPath:React.FC<IColorPath> = ({animatedColor, onThumbTouchIn, onThumbsContainerTouchMove}) => {
+export const ColorPath:React.FC<IColorPath> = ({animatedColor, pickedStopId, onThumbTouchIn, onThumbsContainerTouchMove}) => {
 
     const [thumbsContainerWidth, setThumbsContainerWidth] = useState(100)
     const windowWidth = useWindowDimensions().width
-
+    
+    
     const handleLayout = (e:LayoutChangeEvent) => {
         setThumbsContainerWidth(e.nativeEvent.layout.width)
     }
 
     const handleThumbsContainerTouchMove = (e:GestureResponderEvent) => {
-        const offset = ((e.nativeEvent.pageX-((windowWidth-thumbsContainerWidth)/2))/(thumbsContainerWidth/100)/100)
-        console.log(e.nativeEvent.pageX)
-        if(!(e.nativeEvent.pageX<((windowWidth-thumbsContainerWidth)/2)||e.nativeEvent.pageX>(windowWidth-((windowWidth-thumbsContainerWidth)/2)))){
+        const pageX = e.nativeEvent.pageX
+        const locationX = pageX-((windowWidth-thumbsContainerWidth)/2)
+        const locationXToPercentage = locationX/(thumbsContainerWidth/100)
+        const offset = locationXToPercentage/100
+        const isPageXOverThumbsContainer = (pageX<((windowWidth-thumbsContainerWidth)/2)||pageX>(windowWidth-((windowWidth-thumbsContainerWidth)/2)))
+        if(!isPageXOverThumbsContainer){
             onThumbsContainerTouchMove(offset)
         }
     }
 
     return(
-        <View style={styles.container}>
+        <View 
+        style={styles.container}>
             <View 
             style={styles.thumbsContainer}
             onLayout={handleLayout}
             onTouchMove={handleThumbsContainerTouchMove}>
-                {animatedColor.stops.map(stop => (
-                    <View 
+                {animatedColor.stops.map((stop, index) => (
+                    <Thumb 
                     key={stop.id}
-                    onTouchStart={() => onThumbTouchIn(stop.id)} 
-                    style={{width:"6%", height:"90%", backgroundColor:stop.color, position:'absolute', left:`${stop.offset*100-3}%`}}/>
+                    stop={stop}
+                    isPicked={stop.id === pickedStopId}
+                    index={index}
+                    onTouchIn={onThumbTouchIn}/>
                 ))}
             </View>
-            <LinearGradient 
-            start={{x:0, y:0}} 
-            end={{x:1, y:0}} 
-            colors={animatedColor.stops.map(res => res.color)} 
-            locations={animatedColor.stops.map(res => res.offset)} 
-            style={styles.colorPathContainer}>
-            </LinearGradient>
+            <ColorPathPreview 
+            stops={animatedColor.stops}/>
         </View>
     )
 }
 
+interface IThumb {
+    stop:Stop,
+    isPicked:boolean,
+    index:number,
+    onTouchIn: (id:number) => void
+}
+
+const Thumb:React.FC<IThumb> = ({stop, isPicked, index, onTouchIn}) => {
+    return(
+        <View 
+        onTouchStart={() => onTouchIn(stop.id)} 
+        style={{width:"6%", height:"90%",borderWidth:3, borderColor:isPicked?"white":"grey" ,backgroundColor:stop.color, position:'absolute', left:`${stop.offset*100-3}%`}}>
+                <Text>{index}</Text>
+        </View>
+    )
+}
+
+interface IColorPathPreview {
+    stops:Stop[]
+}
+
+const ColorPathPreview:React.FC<IColorPathPreview> = ({stops}) => {
+    return(
+        <LinearGradient 
+        start={{x:0, y:0}} 
+        end={{x:1, y:0}} 
+        colors={stops.map(res => res.color)} 
+        locations={stops.map(res => res.offset)} 
+        style={styles.colorPathContainer}>
+        </LinearGradient>
+    )
+}
 
 const styles = StyleSheet.create({
     container:{

@@ -9,15 +9,10 @@ import { led } from "../../model/types"
 export const EffectPreview = () => {
 
     const {leds, setLeds} = useLEDStore()
-    
-    const handleLayout = () => {
-        for(let i = 0; i<20; i++){
-            setLeds(prev => [...prev, {id:i, fill:"red"}])
-        }
-    }
+
 
     return(
-        <View style={EffectPreviewStyles.container} onLayout={handleLayout}>
+        <View style={EffectPreviewStyles.container}>
             <View style={EffectPreviewStyles.LedsContainer}>
                 {leds.map(led => (
                     <Led key={led.id} led={led}/>
@@ -32,7 +27,7 @@ const Led:React.FC<{led:led}> = ({led}) => {
     return(
         <View style={EffectPreviewStyles.LedContainer}>
             <Svg viewBox="0 0 10 18">
-                <Rect width={10} height={"100%"} fill={led.fill} rx={2} ry={2}/>
+                <Rect width={10} height={"100%"} fill={"red"} rx={2} ry={2}/>
             </Svg>
         </View>
     )
