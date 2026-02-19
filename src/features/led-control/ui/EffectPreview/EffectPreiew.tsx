@@ -1,14 +1,33 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import { StyleSheet, View } from "react-native"
 import Svg, { Circle, Rect } from "react-native-svg"
 import useLEDStore from "../../model/ledStore"
-import { led } from "../../model/types"
+import { createAnimatedComponent, interpolateColor, ReduceMotion, useAnimatedProps, useSharedValue, withRepeat, withSpring, withTiming } from "react-native-reanimated"
+import { AnimatedColor } from "../EffectEditor/interfaces"
 
-
+interface Led {
+    id:number,
+    fill:AnimatedColor
+}
 
 export const EffectPreview = () => {
 
-    const {leds, setLeds} = useLEDStore()
+    const {ledStrip, setLedStrip} = useLEDStore()
+
+    const newLeds = () => {
+        let newLeds:Led[] = []
+        for(let i = 0; i<=20; i++){
+            newLeds = [...newLeds, {id:i, fill:ledStrip.fill}]
+        }
+        return newLeds
+    }
+
+    const [leds, setLeds] = useState(newLeds())
+
+    useEffect(() => {
+        setLeds(prev => prev.map(led => ({...led, fill:ledStrip.fill})))
+    }, [ledStrip])
+
 
 
     return(
@@ -22,12 +41,32 @@ export const EffectPreview = () => {
     )
 }
 
-const Led:React.FC<{led:led}> = ({led}) => {
+const AnimatedRect = createAnimatedComponent(Rect)
+
+const Led:React.FC<{led:Led}> = ({led}) => {
+    const easingProgress = useSharedValue(0)
+
+    const animatedProps = useAnimatedProps(() => ({
+        fill:interpolateColor(
+            easingProgress.value, 
+            led.fill.stops.map(stop => stop.offset), 
+            led.fill.stops.map(stop => stop.color)
+        )
+    }))
+
+    useEffect(() => {
+        easingProgress.value = withRepeat(
+            withTiming(1, {duration:2000}),
+            -1,
+            true,
+            () => {}
+        )     
+    }, [])
 
     return(
         <View style={EffectPreviewStyles.LedContainer}>
             <Svg viewBox="0 0 10 18">
-                <Rect width={10} height={"100%"} fill={"red"} rx={2} ry={2}/>
+                <AnimatedRect width={10} height={"100%"} animatedProps={animatedProps} rx={2} ry={2}/>
             </Svg>
         </View>
     )

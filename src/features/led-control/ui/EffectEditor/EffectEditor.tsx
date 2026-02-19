@@ -1,8 +1,9 @@
 import ColorPicker, { Preview, HueSlider, SaturationSlider, BrightnessSlider, ColorFormatsObject } from "reanimated-color-picker"
-import { AnimatedColor, IColorPicker } from "./interfaces"
+import { AnimatedColor, IColorPicker, Stop } from "./interfaces"
 import { StyleSheet, View } from "react-native"
 import { useState } from "react"
 import { ColorPath } from "../../../../shared/ColorPath"
+import useLEDStore from "../../model/ledStore"
 
 interface IEffectEditor {
     animatedColor:{
@@ -18,15 +19,9 @@ interface IEffectEditor {
 
 export const EffectEditor = () => {
 
-    const [effectEditor, setEffectEditor] = useState<IEffectEditor>({
-        animatedColor:{
-            stops:[
-                {id:1, color:"red", offset:0},
-                {id:2, color:"green", offset:0.5},
-                {id:3, color:"blue", offset:1}
-            ],
-            easing:"linear"            
-        },
+    const {ledStrip, setLedStrip} = useLEDStore()
+
+    const [effectEditor, setEffectEditor] = useState<{pickedStopID:number|null}>({
         pickedStopID:null
     })
 
@@ -35,15 +30,27 @@ export const EffectEditor = () => {
     }
 
     const handleThumbsContainerMove = (offset:number) => {
-        const stops = effectEditor.animatedColor.stops
+        const stops = ledStrip.fill.stops
         const sortedStops = [...stops].sort((a, b) => a.offset - b.offset)
         const pickedStopID = effectEditor.pickedStopID
-        setEffectEditor(prev => ({...prev, animatedColor:{...prev.animatedColor, stops:sortedStops.map(stop => stop.id === pickedStopID?{...stop, offset:offset}:stop)}}))
+        setLedStrip(prev => 
+            ({...prev,
+                 fill:{
+                    ...prev.fill, 
+                    stops:sortedStops.map(stop => 
+                        stop.id === pickedStopID?
+                        {...stop, offset:offset}:
+                        stop
+                    )
+                }
+            })
+        )
     }
 
-    const handleColorChange = (color:ColorFormatsObject) => (
-        setEffectEditor(prev => ({...prev, animatedColor:{...prev.animatedColor, stops:prev.animatedColor.stops.map(stop => stop.id === prev.pickedStopID? {...stop, color:color.hex}:stop)}}))
-    )
+    const handleColorChange = (color:ColorFormatsObject) => {
+        const pickedStopID = effectEditor.pickedStopID
+        setLedStrip(prev => ({...prev, fill:{...prev.fill, stops:prev.fill.stops.map(stop => stop.id === pickedStopID?{...stop, color:color.hex}:stop)}}))
+    }
 
     return(
         <View 
@@ -51,11 +58,11 @@ export const EffectEditor = () => {
             <ColorPath 
                 onThumbsContainerTouchMove={handleThumbsContainerMove} 
                 onThumbTouchIn={handleThumbTouchIn} 
-                animatedColor={effectEditor.animatedColor} 
+                animatedColor={ledStrip.fill} 
                 pickedStopId={effectEditor.pickedStopID}/>
             {effectEditor.pickedStopID?
                 <ColPicker 
-                    color={effectEditor.animatedColor.stops.find(stop => stop.id === effectEditor.pickedStopID)!.color} 
+                    color={ledStrip.fill.stops.find(stop => stop.id === effectEditor.pickedStopID)!.color} 
                     onColorChange={handleColorChange}/>:
                 <></>
             }
