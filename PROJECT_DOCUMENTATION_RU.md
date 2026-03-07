@@ -19,7 +19,7 @@ Cloudy — это экспериментальное React Native-приложе
 | `src/entities/led-strip/model` | Хранилище Zustand (`useLEDStore`) и типы данных ленты. |
 | `src/features/led-control/ui/EffectPreview` | Анимированный предпросмотр светодиодной ленты. |
 | `src/features/led-control/ui/EffectEditor` | UI для работы со стопами градиента и выбора цвета. |
-| `src/shared/components/GradPicker` | Глобальные компоненты построителя градиентов (ColorPath и вспомогательные утилиты). |
+| `src/shared/components/GradPicker` | Глобальные компоненты построителя градиентов (ColorPathComponent и вспомогательные утилиты). |
 | `src/shared/hooks/ui-context/useUI.ts` | Хук `useUI`, возвращающий палитру глобальных цветов приложения. |
 
 ## Архитектура и поток данных
@@ -45,7 +45,7 @@ Cloudy — это экспериментальное React Native-приложе
 - Цвет выбранного стопа изменяется через `reanimated-color-picker`; после завершения выбора результат пишется в Zustand.
 
 ### Общие компоненты градиента (`src/shared/components/GradPicker`)
-- `ColorPath` предоставляет базовый визуальный редактор градиента с draggable-стопами.
+- `ColorPathComponent` предоставляет базовый визуальный редактор градиента с draggable-стопами.
 - `ColorPathWithLocalStates` инкапсулирует состояние и обработчики перемещения, что облегчает повторное использование в редакторе эффектов.
 - Заготовки `ColorMenu.tsx` и `GradPicker.tsx` пока пустые — их можно использовать для построения более сложного UI (например, списков сохранённых пресетов).
 

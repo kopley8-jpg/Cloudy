@@ -9,17 +9,17 @@ import {
 } from "react-native"
 import LinearGradient from "react-native-linear-gradient"
 
-import { Stop } from "../../model/gradient"
+import { GradientStopType } from '@shared/model/gradient.ts';
 
 interface ColorPathProps {
-    stops: Stop[]
+    stops: GradientStopType[]
     pickedStopId: number | null
     onThumbTouchStart: (id: number) => void
     onThumbsContainerMove: (offset: number) => void
     onThumbsContainerMoveComplete?: () => void
 }
 
-export const ColorPath: React.FC<ColorPathProps> = ({
+export const ColorPathComponent: React.FC<ColorPathProps> = ({
     stops,
     pickedStopId,
     onThumbTouchStart,
@@ -61,17 +61,19 @@ export const ColorPath: React.FC<ColorPathProps> = ({
     )
 }
 
+//TODO: убрать нахуй, типы выносяться нахуй
 interface ThumbProps {
-    stop: Stop
+    stop: GradientStopType
     isPicked: boolean
     index: number
     onTouchStart: (id: number) => void
 }
 
-const Thumb: React.FC<ThumbProps> = ({ stop, isPicked, index, onTouchStart }) => {
+const Thumb = ({ stop, isPicked, index, onTouchStart }: ThumbProps) => {
     return (
         <View
             onTouchStart={() => onTouchStart(stop.id)}
+            //TODO: убрать нахуй
             style={{
                 width: "6%",
                 height: "90%",
@@ -88,7 +90,7 @@ const Thumb: React.FC<ThumbProps> = ({ stop, isPicked, index, onTouchStart }) =>
 }
 
 interface ColorPathPreviewProps {
-    stops: Stop[]
+    stops: GradientStopType[]
 }
 
 const ColorPathPreview: React.FC<ColorPathPreviewProps> = ({ stops }) => {
@@ -103,6 +105,7 @@ const ColorPathPreview: React.FC<ColorPathPreviewProps> = ({ stops }) => {
     )
 }
 
+//TODO: убрать нахуй
 const styles = StyleSheet.create({
     container: {
         width: "95%",

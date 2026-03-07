@@ -1,1 +1,1 @@
-export { ColorPath, ColorPathWithLocalStates } from "./color-path/ColorPath"
+export { ColorPath, ColorPathWithLocalStates } from "./color-path/ColorPathComponent"
