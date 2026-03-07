@@ -107,14 +107,14 @@ const styles = StyleSheet.create({
     }
 })
 
-const ColPicker:React.FC<IColorPicker> = ({color, onColorChange, onColorChangeComplete}) => {
+const ColPicker = ({color, onColorChange, onColorChangeComplete}: IColorPicker) => {
     return(
         <ColorPicker
         style={{ width: '70%', marginTop:20}}
         value={color}
         onChangeJS={color => onColorChange(color)}
         onCompleteJS={onColorChangeComplete}>
-            <Preview hideInitialColor={true}/>
+            <Preview hideInitialColor/>
             <HueSlider sliderThickness={20} style={{marginVertical:10}}/>
             <SaturationSlider sliderThickness={20} style={{marginVertical:10}}/>
             <BrightnessSlider sliderThickness={20} style={{marginVertical:10}}/>
