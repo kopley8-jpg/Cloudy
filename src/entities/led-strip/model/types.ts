@@ -1,4 +1,4 @@
-import type { AnimatedColor } from "../../../shared/model/gradient"
+import type { AnimatedColor } from "@shared/model/gradient"
 
 
 export type LedStrip = {
