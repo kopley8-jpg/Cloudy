@@ -1,9 +1,9 @@
 import ColorPicker, { Preview, HueSlider, SaturationSlider, BrightnessSlider, ColorFormatsObject } from "reanimated-color-picker"
 import { AnimatedColor, IColorPicker, Stop } from "./interfaces"
-import { StyleSheet, Text, View } from "react-native"
+import { StyleSheet, View } from "react-native"
 import { useState } from "react"
-import { ColorPath, ColorPathWithLocalStates } from "../../../../shared/GradPicker/ColorPath"
-import useLEDStore from "../../model/ledStore"
+import { ColorPathWithLocalStates } from "../../../../shared/ui"
+import { useLEDStore } from "../../../../entities/led-strip"
 
 interface IEffectEditor {
     animatedColor:{
