@@ -2,9 +2,10 @@ import ColorPicker, { Preview, HueSlider, SaturationSlider, BrightnessSlider, Co
 import { AnimatedColor, IColorPicker, Stop } from "./interfaces"
 import { StyleSheet, View } from "react-native"
 import { useState } from "react"
-import { ColorPathWithLocalStates } from "../../../../shared/ui"
+import { ColorPathWithLocalStates } from '@features/led-control/components/ColorPath/ui';
 import { useLEDStore } from "../../../../entities/led-strip"
 
+//TODO: убрать нахуй, типы выносяться нахуй
 interface IEffectEditor {
     animatedColor:{
         stops:{
