@@ -87,7 +87,7 @@ const EffectPreviewStyles = StyleSheet.create({
         borderRadius:20
     },
     LedContainer:{
-        width:"3%",
+        width:"2.6%",
         height:"100%",
     }
 })

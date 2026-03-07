@@ -1,8 +1,8 @@
 import ColorPicker, { Preview, HueSlider, SaturationSlider, BrightnessSlider, ColorFormatsObject } from "reanimated-color-picker"
 import { AnimatedColor, IColorPicker, Stop } from "./interfaces"
-import { StyleSheet, View } from "react-native"
+import { StyleSheet, Text, View } from "react-native"
 import { useState } from "react"
-import { ColorPath } from "../../../../shared/ColorPath"
+import { ColorPath, ColorPathWithLocalStates } from "../../../../shared/GradPicker/ColorPath"
 import useLEDStore from "../../model/ledStore"
 
 interface IEffectEditor {
@@ -20,51 +20,76 @@ interface IEffectEditor {
 export const EffectEditor = () => {
 
     const {ledStrip, setLedStrip} = useLEDStore()
+    const [editingStops, setEditingStops] = useState<Stop[]>(ledStrip.fill.stops) 
+    const [pickedStopId, setPickedStopID] = useState<number|null>(1)
 
-    const [effectEditor, setEffectEditor] = useState<{pickedStopID:number|null}>({
-        pickedStopID:null
-    })
-
-    const handleThumbTouchIn = (id:number) => {
-        setEffectEditor(prev => ({...prev, pickedStopID:prev.pickedStopID===id?null:id}))
+    const changeOffsetForPickedStop = (offset:number) => {
+        if(pickedStopId === null) return
+        const sortedStops = [...editingStops].sort((a, b) => a.offset - b.offset)
+        const newStops = [...editingStops].map(stop => 
+            stop.id === pickedStopId
+            ?{...stop, offset:offset}
+            :stop
+        )
+        setEditingStops(newStops)
     }
 
-    const handleThumbsContainerMove = (offset:number) => {
-        const stops = ledStrip.fill.stops
-        const sortedStops = [...stops].sort((a, b) => a.offset - b.offset)
-        const pickedStopID = effectEditor.pickedStopID
-        setLedStrip(prev => 
-            ({...prev,
-                 fill:{
-                    ...prev.fill, 
-                    stops:sortedStops.map(stop => 
-                        stop.id === pickedStopID?
-                        {...stop, offset:offset}:
-                        stop
-                    )
-                }
-            })
+    const changePickedStopId = (id:number) => {
+        setPickedStopID(prev => 
+            prev === id
+            ? null
+            : id
         )
     }
 
-    const handleColorChange = (color:ColorFormatsObject) => {
-        const pickedStopID = effectEditor.pickedStopID
-        setLedStrip(prev => ({...prev, fill:{...prev.fill, stops:prev.fill.stops.map(stop => stop.id === pickedStopID?{...stop, color:color.hex}:stop)}}))
+    const handleColPickerColorChange = (color:ColorFormatsObject) => {
+        setEditingStops(prev => 
+            prev.map(stop => 
+                stop.id === pickedStopId
+                ? ({...stop, color:color.hex})
+                : stop
+            )
+        )
     }
+
+    const handleColPickerColorChangeComplete = () => {
+        setLedStrip(prev => ({
+            ...prev,
+            fill: {
+                ...prev.fill,
+                stops:editingStops
+            }
+        }))
+    }    
 
     return(
         <View 
-            style={styles.container}>
-            <ColorPath 
-                onThumbsContainerTouchMove={handleThumbsContainerMove} 
-                onThumbTouchIn={handleThumbTouchIn} 
-                animatedColor={ledStrip.fill} 
-                pickedStopId={effectEditor.pickedStopID}/>
-            {effectEditor.pickedStopID?
-                <ColPicker 
-                    color={ledStrip.fill.stops.find(stop => stop.id === effectEditor.pickedStopID)!.color} 
-                    onColorChange={handleColorChange}/>:
-                <></>
+            style={styles.container}
+        >
+            {/* <ColorPath
+                stops={editingStops}
+                pickedStopId={pickedStopId} 
+                onThumbTouchStart={changePickedStopId}
+                onThumbsContainerMove={changeOffsetForPickedStop}
+            /> */}
+                {/* {editingStops.map((stop, index) =>(
+                    <Text key={stop.id} style={{color:"white"}}>
+                        {`
+                        id:${stop.id},
+                        index:${index}, 
+                        color:${stop.color}, 
+                        offset:${stop.offset}, 
+                        picked:${pickedStopID===stop.id?"true":"false"}`
+                        }</Text>)
+                )} */}
+                <ColorPathWithLocalStates stops={editingStops}/>
+            {pickedStopId
+                ?<ColPicker 
+                    color={editingStops.find(stop => stop.id === pickedStopId)!.color} 
+                    onColorChange={handleColPickerColorChange}
+                    onColorChangeComplete={handleColPickerColorChangeComplete}
+                    />
+                :<></>
             }
         </View>
     )
@@ -81,9 +106,13 @@ const styles = StyleSheet.create({
     }
 })
 
-const ColPicker:React.FC<IColorPicker> = ({color, onColorChange}) => {
+const ColPicker:React.FC<IColorPicker> = ({color, onColorChange, onColorChangeComplete}) => {
     return(
-        <ColorPicker style={{ width: '70%', marginTop:20}} value={color} onChangeJS={color => onColorChange(color)}>
+        <ColorPicker 
+        style={{ width: '70%', marginTop:20}} 
+        value={color} 
+        onChangeJS={color => onColorChange(color)}
+        onCompleteJS={onColorChangeComplete}>
             <Preview hideInitialColor={true}/>
             <HueSlider sliderThickness={20} style={{marginVertical:10}}/>
             <SaturationSlider sliderThickness={20} style={{marginVertical:10}}/>

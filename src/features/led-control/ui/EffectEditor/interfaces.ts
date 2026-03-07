@@ -1,6 +1,10 @@
 import { ColorFormatsObject } from "reanimated-color-picker";
 
-export interface IColorPicker {color:string,onColorChange:((color:ColorFormatsObject) => void)}
+export interface IColorPicker {
+    color:string,
+    onColorChange:((color:ColorFormatsObject) => void),
+    onColorChangeComplete:() => void
+}
 
 export interface AnimatedColor {
     stops:Stop[],
