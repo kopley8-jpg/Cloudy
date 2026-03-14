@@ -1,20 +1,10 @@
-import { ColorFormatsObject } from "reanimated-color-picker";
+import { ColorFormatsObject } from "reanimated-color-picker"
+import type { AnimatedColor, Stop } from "../../../../shared/model/gradient"
 
 export interface IColorPicker {
-    color:string,
-    onColorChange:((color:ColorFormatsObject) => void),
-    onColorChangeComplete:() => void
+    color: string
+    onColorChange: (color: ColorFormatsObject) => void
+    onColorChangeComplete: () => void
 }
 
-export interface AnimatedColor {
-    stops:Stop[],
-    easing:"linear"
-}
-
-export interface Stop {
-    id:number,
-    color:string,
-    offset:number
-}
-
-//((e.nativeEvent.pageX-((windowWidth-thumbsContainerWidth)/2))/(thumbsContainerWidth/100)/100)
+export type { AnimatedColor, Stop }

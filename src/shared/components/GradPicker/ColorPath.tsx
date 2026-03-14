@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { GestureResponderEvent, LayoutChangeEvent, LayoutRectangle, StyleSheet, Text, useWindowDimensions, View } from "react-native"
 
-import { AnimatedColor, Stop } from "../../features/led-control/ui/EffectEditor/interfaces"
+import { AnimatedColor, Stop } from "@features/led-control/ui/EffectEditor/interfaces"
 import LinearGradient from "react-native-linear-gradient"
 
 interface IColorPath {
@@ -16,7 +16,7 @@ export const ColorPath:React.FC<IColorPath> = ({stops, pickedStopId, onThumbTouc
 
     const [thumbsContainerWidth, setThumbsContainerWidth] = useState(100)
     const windowWidth = useWindowDimensions().width
-    
+
     const handleLayout = (e:LayoutChangeEvent) => {
         setThumbsContainerWidth(e.nativeEvent.layout.width)
     }
@@ -35,15 +35,15 @@ export const ColorPath:React.FC<IColorPath> = ({stops, pickedStopId, onThumbTouc
     }
 
     return(
-        <View 
+        <View
         style={styles.container}>
-            <View 
+            <View
             style={styles.thumbsContainer}
             onLayout={handleLayout}
             onTouchMove={handleThumbsContainerTouchMove}
             onTouchEnd={handleThumbsContainerTouchEnd}>
                 {stops.map((stop, index) => (
-                    <Thumb 
+                    <Thumb
                     key={stop.id}
                     stop={stop}
                     isPicked={stop.id === pickedStopId}
@@ -51,7 +51,7 @@ export const ColorPath:React.FC<IColorPath> = ({stops, pickedStopId, onThumbTouc
                     onTouchStart={handleTouchStart}/>
                 ))}
             </View>
-            <ColorPathPreview 
+            <ColorPathPreview
             stops={stops}/>
         </View>
     )
@@ -66,8 +66,8 @@ interface IThumb {
 
 const Thumb:React.FC<IThumb> = ({stop, isPicked, index, onTouchStart}) => {
     return(
-        <View 
-        onTouchStart={() => onTouchStart(stop.id)} 
+        <View
+        onTouchStart={() => onTouchStart(stop.id)}
         style={{width:"6%", height:"90%",borderWidth:3, borderColor:isPicked?"white":"grey" ,backgroundColor:stop.color, position:'absolute', left:`${stop.offset*100-3}%`}}>
                 <Text>{index}</Text>
         </View>
@@ -80,11 +80,11 @@ interface IColorPathPreview {
 
 const ColorPathPreview:React.FC<IColorPathPreview> = ({stops}) => {
     return(
-        <LinearGradient 
-        start={{x:0, y:0}} 
-        end={{x:1, y:0}} 
-        colors={stops.map(res => res.color)} 
-        locations={stops.map(res => res.offset)} 
+        <LinearGradient
+        start={{x:0, y:0}}
+        end={{x:1, y:0}}
+        colors={stops.map(res => res.color)}
+        locations={stops.map(res => res.offset)}
         style={styles.colorPathContainer}>
         </LinearGradient>
     )
@@ -118,16 +118,16 @@ const pagexToOffset = (pageX:number, windowWidth:number, thumbsContainerWidth:nu
 }
 
 export const ColorPathWithLocalStates:React.FC<{stops:Stop[]}> = ({stops}) => {
-    
+
     const [editingStops, setEditingStops] = useState<Stop[]>([...stops])
     const [pickedStopId, setPickedStopID] = useState<number|null>(null)
     const [containerWidth, setContainerWidth] = useState<number>(0)
     const windowWidth = useWindowDimensions().width
 
     const changeOffsetForPickedStop = (offset:number) => {
-        if(pickedStopId === null) return 
+        if(pickedStopId === null) return
         const sortedStops = [...editingStops].sort((a, b) => a.offset - b.offset)
-        const newStops = [...sortedStops].map(stop => 
+        const newStops = [...sortedStops].map(stop =>
             stop.id === pickedStopId
             ?{...stop, offset:offset}
             :stop
@@ -137,7 +137,7 @@ export const ColorPathWithLocalStates:React.FC<{stops:Stop[]}> = ({stops}) => {
     }
 
     const changePickedStopId = (id:number) => {
-        setPickedStopID(prev => 
+        setPickedStopID(prev =>
             prev === id
             ? null
             : id
@@ -146,7 +146,7 @@ export const ColorPathWithLocalStates:React.FC<{stops:Stop[]}> = ({stops}) => {
 
     const handleLayout = (e:LayoutChangeEvent) => {
         setContainerWidth(e.nativeEvent.layout.width)
-    }    
+    }
 
     const handleThumbsContainerTouchMove = (e:GestureResponderEvent) => {
         const offset = pagexToOffset(e.nativeEvent.pageX,windowWidth, containerWidth)
@@ -158,15 +158,15 @@ export const ColorPathWithLocalStates:React.FC<{stops:Stop[]}> = ({stops}) => {
     }
 
     return(
-        <View 
+        <View
         style={styles.container}>
-            <View 
+            <View
             style={styles.thumbsContainer}
             onLayout={handleLayout}
             onTouchMove={handleThumbsContainerTouchMove}
             onTouchEnd={() => {}}>
                 {editingStops.map((stop, index) => (
-                    <Thumb 
+                    <Thumb
                     key={stop.id}
                     stop={stop}
                     isPicked={stop.id === pickedStopId}
@@ -174,7 +174,7 @@ export const ColorPathWithLocalStates:React.FC<{stops:Stop[]}> = ({stops}) => {
                     onTouchStart={handleThumbTouchStart}/>
                 ))}
             </View>
-            <ColorPathPreview 
+            <ColorPathPreview
             stops={editingStops}/>
         </View>
     )

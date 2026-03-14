@@ -1,97 +1,63 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Cloudy
 
-# Getting Started
+Экспериментальное приложение для визуального редактирования анимированных градиентов светодиодной ленты. Пользователь изменяет стопы градиента, а приложение мгновенно показывает результат на виртуальной ленте при помощи Reanimated-анимаций и SVG.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Технологии
 
-## Step 1: Start Metro
-zzzzzv3
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- **React Native 0.83 / React 19** — каркас мобильного приложения.
+- **TypeScript** — строгая типизация всех слоёв.
+- **Zustand** — стор `useLEDStore` в `src/entities/led-strip/model`.
+- **react-native-reanimated**, **reanimated-color-picker** — анимации и выбор цветов.
+- **react-native-svg** — визуализация LED-сегментов.
+- **react-native-linear-gradient** — предпросмотр статичных градиентов.
+- **Feature-Sliced Design (FSD)** — организационная парадигма кода.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Быстрый старт
 
 ```sh
-# Using npm
+# установка зависимостей
+npm install
+
+# запуск Metro
 npm start
 
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
+# запуск платформ
 npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+Перед `npm run ios` выполните `bundle install && bundle exec pod install` внутри каталога `ios`.
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## Бранчинг-стратегия
 
-## Step 3: Modify your app
+1. **main** — стабильные релизные сборки. Прямые коммиты запрещены.
+2. **develop** — основная ветка разработки. Вливаем только через PR из feature-веток.
+3. **feature/<scope>** — изолированные задачи. Названия включают домен и краткое описание (например, `feature/led-preview-improvements`). После ревью feature мерджится в `develop`, затем при релизе `develop` сливается в `main` через fast-forward/merge commit.
+4. **hotfix/<name>** — только для срочных багфиксов в `main`; после мерджа фикс обязательно переносится в `develop`.
 
-Now that you have successfully run the app, let's make changes!
+## Кодстайл и FSD
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+Мы придерживаемся Feature-Sliced Design:
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-ZZZZZZZZZZZZZZZZZZZZZZZZ
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+- **shared** — общие ресурсы (компоненты, хуки, модели). Глобальные UI-компоненты живут в `shared/components`, а инфраструктурные хуки вроде `useUI` — в `shared/hooks`.
+- **entities** — бизнес-сущности. Модель LED-ленты (`useLEDStore`, типы) расположена в `entities/led-strip` и используется остальными слоями через публичные API (`index.ts`).
+- **features** — пользовательские сценарии. Например, `features/led-control/ui` содержит `EffectEditor` и `EffectPreview`, а подкомпоненты находятся в `features/led-control/components`.
+- **screens** — композиция features/entities в рамках экранов (например, `screens/main/ui/Main.screen.tsx`).
 
-## Congratulations! :tada:
+Правила:
 
-You've successfully run and modified your React Native App. :partying_face:
+1. Импорты только через публичные API (`@entities/...`, `@features/...`, `@shared/...`). Прямой доступ к «глубоким» файлам запрещён.
+2. Локальные стили получают цвета через `useUI` (`src/shared/hooks/ui-context/useUI.ts`) вместо жёстко заданных hex.
+3. Модели/сторы не лежат в `features/*/model`; все бизнес-модели размещаем в соответствующих `entities/*` (см. правило проекта «models live in entities»).
+4. Общие компоненты должны быть без бизнес-логики; интерактивные обёртки находятся в features или screens.
 
-### Now what?
+## Полезные команды
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+```sh
+npm run lint      # ESLint + Prettier
+npm test          # Jest (по мере добавления тестов)
+```
 
-# Troubleshooting
+## Контакты
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Вопросы по проекту и вкладу оформляйте через Issues/PR. Соблюдайте описанную выше структуру и бранчинг — это ускоряет ревью и сохраняет единый стиль.
